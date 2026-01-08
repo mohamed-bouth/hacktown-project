@@ -1,6 +1,9 @@
 <?php 
-require_once '../../config/database.php';
 require_once '../repositories/PostRepository.php';
+
+$posts = new PostRepository();
+$results = $posts->getAllPosts();
+
 
 // Auth Check
 // if (!isset($_SESSION['user_id'])) {
@@ -326,6 +329,7 @@ require_once '../repositories/PostRepository.php';
             </div>
         </section>
         <section class="section-of-card">
+            <?php foreach ($posts as $post) { ?>
             <article class="post-card">
                 <div class="card-image-wrapper">
                     <img src="https://imgs.search.brave.com/qVXQkEpAKMNKCv_eCmNVq_1_Keb5-xJaU5pDjSxINis/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/bW9zLmNtcy5mdXR1/cmVjZG4ubmV0L1g0/dFpWeVRhOXJteXJW/d3Q3Z2lUd1UuanBn" alt="Brown Leather Wallet" class="card-image">
@@ -350,6 +354,7 @@ require_once '../repositories/PostRepository.php';
                     </form>
                 </div>
             </article>
+            <?php } ?>
 
             <article class="post-card">
                 <div class="card-image-wrapper">

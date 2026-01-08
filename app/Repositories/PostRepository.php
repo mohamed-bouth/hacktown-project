@@ -1,17 +1,15 @@
 <?php
-namespace App\Repositories;
-
-use App\Core\Database;
-use PDO;
-use App\Models\Post;
+require_once '../../config/database.php';
+require_once '../Models/Post.php';
 
 class PostRepository
 {
-    private PDO $db;
+    private $db;
 
     public function __construct()
     {
-        $this->db = Database::getInstance();
+        $database = new Database();
+        $this->db = $database->getConnection();
     }
 
     public function search(array $filters): array
@@ -85,20 +83,7 @@ class PostRepository
         ]);
     }
     public function getAllPosts() {
-        $posts = [];
-        // Get all posts, ordered by newest first
-        $query = "SELECT * FROM posts ORDER BY created_at DESC";
-
-        $stmt = $this->db->prepare($query);
-        $stmt->execute();
-
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Convert raw SQL arrays into Post Objects
-        foreach ($results as $row) {
-            $posts[] = new Post($row);
-        }
-
-        return $posts;
-    }
+    $stmt = $this->db->query("SELECT * FROM posts");
+    return $stmt->fetchAll();
+}
 }
