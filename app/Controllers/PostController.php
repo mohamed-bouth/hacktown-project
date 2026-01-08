@@ -47,6 +47,7 @@ class PostController extends Controller
     public function store(): void
     {
         $data = [
+            'user_id' =>$_SESSION['user_id'],
             'type' => $_POST['type'] ?? '',
             'category' => $_POST['category'] ?? '',
             'city' => trim($_POST['city'] ?? ''),

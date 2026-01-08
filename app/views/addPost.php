@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FoundAndLost - Add Post</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/navbar.css">
-<?php require_once "./partials/navbar.php" ?>
+    <?php require_once "./partials/navbar.php" ?>
     <style>
         /* --- 1. Design Variables --- */
         :root {
@@ -15,7 +16,7 @@
             --text-primary: #111827;
             --text-secondary: #6B7280;
             --border-color: #E5E7EB;
-            
+
             /* Status Colors */
             --color-lost: #EF4444;
             --color-lost-hover: #DC2626;
@@ -51,7 +52,8 @@
             box-shadow: var(--shadow-card);
             overflow: hidden;
             transition: border-color 0.3s ease;
-            border-top: 6px solid var(--theme-color); /* Visual indicator of current mode */
+            border-top: 6px solid var(--theme-color);
+            /* Visual indicator of current mode */
         }
 
         /* --- 3. The Toggle Section --- */
@@ -77,16 +79,18 @@
 
         /* State: Active Lost (Red) */
         .form-container[data-theme="lost"] .toggle-btn[data-type="lost"] {
-            background-color: #FEF2F2; /* Very light red */
+            background-color: #FEF2F2;
+            /* Very light red */
             color: var(--color-lost);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         /* State: Active Found (Green) */
         .form-container[data-theme="found"] .toggle-btn[data-type="found"] {
-            background-color: #ECFDF5; /* Very light green */
+            background-color: #ECFDF5;
+            /* Very light green */
             color: var(--color-found);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         /* --- 4. Form Content --- */
@@ -109,7 +113,7 @@
             color: var(--text-primary);
         }
 
-        input[type="text"], 
+        input[type="text"],
         input[type="date"],
         select,
         textarea {
@@ -121,14 +125,18 @@
             color: var(--text-primary);
             transition: border-color 0.2s, box-shadow 0.2s;
             width: 100%;
-            box-sizing: border-box; /* Ensures padding doesn't break width */
+            box-sizing: border-box;
+            /* Ensures padding doesn't break width */
         }
 
         /* Focus State uses the Theme Color */
-        input:focus, select:focus, textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--theme-color);
-            box-shadow: 0 0 0 3px rgba(0,0,0,0.05); /* Subtle ring */
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+            /* Subtle ring */
         }
 
         /* --- 5. File Upload --- */
@@ -196,13 +204,13 @@
         .submit-btn:hover {
             background-color: var(--theme-color-hover);
         }
-
     </style>
 </head>
+
 <body>
 
     <div class="form-container" id="postForm" data-theme="lost">
-        
+
         <div class="toggle-header">
             <button class="toggle-btn" data-type="lost" onclick="setTheme('lost')">
                 I Lost Something
@@ -212,19 +220,20 @@
             </button>
         </div>
 
-        <form class="form-body" onsubmit="event.preventDefault(); alert('Post Published!');">
-            
+        <form class="form-body" method="POST" action="/posts">
+
             <div class="form-group">
                 <label for="title">What is the item?</label>
-                <input type="text" id="title" placeholder="e.g. Black Leather Wallet" required>
+                <input type="text" name="title" id="title"
+                    placeholder="e.g. Black Leather Wallet" required>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
                 <div class="form-group">
-                    <label for="category">Category</label>
-                    <select id="category">
+                    <label>Category</label>
+                    <select name="category">
                         <option>Electronics</option>
-                        <option>Wallet / Money</option>
+                        <option>Wallet</option>
                         <option>Keys</option>
                         <option>Pets</option>
                         <option>Documents</option>
@@ -232,56 +241,43 @@
                         <option>Other</option>
                     </select>
                 </div>
+
                 <div class="form-group">
-                    <label for="city">City</label>
-                    <input type="text" id="city" placeholder="e.g. New York">
+                    <label>City</label>
+                    <input type="text" name="city" placeholder="Casablanca" required>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+            <div style="display:grid; grid-template-columns:2fr 1fr; gap:20px;">
                 <div class="form-group">
-                    <label for="location">Specific Location (Optional)</label>
-                    <input type="text" id="location" placeholder="e.g. Near the Central Fountain">
+                    <label>Location</label>
+                    <input type="text" name="location_text"
+                        placeholder="Near central market">
                 </div>
+
                 <div class="form-group">
-                    <label for="date">Date</label>
-                    <input type="date" id="date" required>
+                    <label>Date</label>
+                    <input type="date" name="lost_date" required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" rows="4" placeholder="Describe distinct features, scratches, contents, etc."></textarea>
+                <label>Description</label>
+                <textarea name="description" rows="4"></textarea>
             </div>
 
             <div class="form-group">
-                <label>Photos</label>
-                <div class="upload-area">
-                    <svg class="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <div class="upload-text">Click to upload or drag and drop</div>
-                </div>
+                <label>WhatsApp</label>
+                <input type="text" name="whatsapp" required>
             </div>
 
-            <div class="form-group">
-                <label>Contact Method</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" checked> In-app Chat
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox"> Phone
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox"> Email
-                    </label>
-                </div>
-            </div>
+            <input type="hidden" name="type" value="lost">
 
-            <button type="submit" class="submit-btn" id="submitBtn">Publish Lost Listing</button>
-
+            <button type="submit" class="submit-btn">
+                Publish Lost Listing
+            </button>
         </form>
+
     </div>
 
     <script>
@@ -306,4 +302,5 @@
         }
     </script>
 </body>
+
 </html>

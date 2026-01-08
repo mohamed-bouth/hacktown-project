@@ -1,7 +1,7 @@
 <?php
 return [
     'host' => '127.0.0.1',
-    'database' => 'foundandlost',
+    'database' => 'lost_and_found',
     'username' => 'root',
     'password' => '',
 ];
