@@ -1,3 +1,21 @@
+<?php 
+require_once '../../config/database.php';
+require_once '../repositories/PostRepository.php';
+
+// Auth Check
+// if (!isset($_SESSION['user_id'])) {
+//     header("Location: ./auth/login.php");
+//     exit();
+// }
+
+// --- 2. FETCH DATA ---
+$database = new Database();
+$db = $database->getConnection();
+$postRepo = new PostRepository($db);
+
+// Get list of Post Objects
+$posts = $postRepo->getAllPosts();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

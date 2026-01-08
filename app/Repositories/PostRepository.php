@@ -1,85 +1,30 @@
 <?php
-namespace App\Repositories;
+// repositories/PostRepository.php
+require_once __DIR__ . '/../models/Post.php'; // Adjust path if needed
 
-use App\Core\Database;
-use PDO;
+class PostRepository {
+    private $conn;
 
-class PostRepository
-{
-    private PDO $db;
-
-    public function __construct()
-    {
-        $this->db = Database::getInstance();
+    public function __construct($dbConnection) {
+        $this->conn = $dbConnection;
     }
 
-    public function search(array $filters): array
-    {
-        $sql = "SELECT * FROM posts WHERE status = 'active'";
-        $params = [];
+    public function getAllPosts() {
+        $posts = [];
+        // Get all posts, ordered by newest first
+        $query = "SELECT * FROM posts ORDER BY created_at DESC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (!empty($filters['keyword'])) {
-            $sql .= ' AND (description LIKE :kw OR location_text LIKE :kw OR city LIKE :kw OR category LIKE :kw)';
-            $params['kw'] = '%' . $filters['keyword'] . '%';
+        // Convert raw SQL arrays into Post Objects
+        foreach ($results as $row) {
+            $posts[] = new Post($row);
         }
 
-        if (!empty($filters['type'])) {
-            $sql .= ' AND type = :type';
-            $params['type'] = $filters['type'];
-        }
-
-        if (!empty($filters['category'])) {
-            $sql .= ' AND category = :category';
-            $params['category'] = $filters['category'];
-        }
-
-        if (!empty($filters['city'])) {
-            $sql .= ' AND city = :city';
-            $params['city'] = $filters['city'];
-        }
-
-        $sql .= ' ORDER BY created_at DESC';
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
-    }
-
-    public function find(int $id): ?array
-    {
-        $stmt = $this->db->prepare('SELECT * FROM posts WHERE id = :id');
-        $stmt->execute(['id' => $id]);
-        $row = $stmt->fetch();
-        return $row ?: null;
-    }
-
-    public function create(array $data): int
-    {
-        $stmt = $this->db->prepare(
-            'INSERT INTO posts (type, category, city, location_text, description, whatsapp, phone, status, created_at)
-             VALUES (:type, :category, :city, :location_text, :description, :whatsapp, :phone, :status, NOW())'
-        );
-
-        $stmt->execute([
-            'type' => $data['type'],
-            'category' => $data['category'],
-            'city' => $data['city'],
-            'location_text' => $data['location_text'],
-            'description' => $data['description'],
-            'whatsapp' => $data['whatsapp'],
-            'phone' => $data['phone'],
-            'status' => 'active',
-        ]);
-
-        return (int) $this->db->lastInsertId();
-    }
-
-    public function markResolved(int $id): void
-    {
-        $stmt = $this->db->prepare('UPDATE posts SET status = :status WHERE id = :id');
-        $stmt->execute([
-            'status' => 'resolved',
-            'id' => $id,
-        ]);
+        return $posts;
     }
 }
+?>

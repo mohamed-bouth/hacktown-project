@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
   `phone` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` enum('active','resolved') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `image_url` varchar(255) COLLATE utf8mb4_unicode_ci not null,
   PRIMARY KEY (`id`),
   KEY `fk_posts_user` (`user_id`),
   CONSTRAINT `fk_posts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
