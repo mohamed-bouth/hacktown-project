@@ -6,7 +6,7 @@
 
         <div class="nav-links">
             <a href="./dashboard.php" class="nav-link">Home</a>
-            <a href="./addPost.php" class="nav-link">Add Post</a>
+            <a href="./postManagement.php" class="nav-link">Add Post</a>
             <a href="./searchPost.php" class="nav-link">How it Works</a>
         </div>
 
@@ -20,10 +20,9 @@
     </div>
 
     <div class="mobile-menu" id="mobileMenu">
-        <a href="index.html">Home</a>
-        <a href="search.html">Browse Items</a>
-        <a href="#">How it Works</a>
-        <a href="#">Log In</a>
+        <a href="./dashboard.php" class="nav-link">Home</a>
+        <a href="./postManagement.php" class="nav-link">Add Post</a>
+        <a href="./searchPost.php" class="nav-link">How it Works</a>
     </div>
 </nav>
 

@@ -85,6 +85,20 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
+        .category-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
         .status-badge.lost {
             background-color: var(--status-lost);
         }
@@ -142,12 +156,11 @@
     .dashboard-hero {
         /* Background: Very light grey to separate from white navbar */
         background-color: #F9FAFB; 
-        padding: 80px 24px;
+        padding: 80px 0px;
         display: flex;
         justify-content: center;
         align-items: center;
         text-align: center;
-        border-bottom: 1px solid #E5E7EB;
     }
 
     .hero-content {
@@ -253,10 +266,22 @@
     .allsection {
         display: flex;
         flex-direction: column;
+        width: 100%;
     }
 
     .section-of-card {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+    }
+
+    .button_details {
+        width: 100%;
+        border: none;
+        height: 30px;
+        border-radius: 10px;
+        color: white;
+        background-color: #DC2626;
     }
     </style>
 </head>
@@ -273,14 +298,14 @@
 
                 <div class="hero-actions">
                     
-                    <a href="post.html" class="hero-btn btn-add">
+                    <a href="./addPost.php" class="hero-btn btn-add">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                         </svg>
                         Add Post
                     </a>
 
-                    <a href="search.html" class="hero-btn btn-search">
+                    <a href="./searchPost.php" class="hero-btn btn-search">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
@@ -293,8 +318,9 @@
         <section class="section-of-card">
             <article class="post-card">
                 <div class="card-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1547496502-ffa22ed47b72?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Brown Leather Wallet" class="card-image">
+                    <img src="https://picsum.photos\400\300" alt="Brown Leather Wallet" class="card-image">
                     <span class="status-badge lost">Lost</span>
+                    <span class="category-badge">phone</span>
                 </div>
                 <div class="card-content">
                     <h3 class="card-title">Vintage Brown Leather Wallet</h3>
@@ -308,13 +334,18 @@
                             <span>2 hrs ago</span>
                         </div>
                     </div>
+                    <form action="">
+                        <input type="text" hidden>
+                        <button class="button_details" type="submit">see details</button>
+                    </form>
                 </div>
             </article>
 
             <article class="post-card">
                 <div class="card-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Macbook Pro" class="card-image">
+                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
                     <span class="status-badge found">Found</span>
+                    <span class="category-badge">phone</span>
                 </div>
                 <div class="card-content">
                     <h3 class="card-title">Silver MacBook Pro (2021)</h3>
@@ -328,12 +359,17 @@
                             <span>Yesterday</span>
                         </div>
                     </div>
+                    <form action="">
+                        <input type="text" hidden>
+                        <button class="button_details" type="submit">see details</button>
+                    </form>
                 </div>
             </article>
-                    <article class="post-card">
+            <article class="post-card">
                 <div class="card-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Macbook Pro" class="card-image">
+                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
                     <span class="status-badge found">Found</span>
+                    <span class="category-badge">phone</span>
                 </div>
                 <div class="card-content">
                     <h3 class="card-title">Silver MacBook Pro (2021)</h3>
@@ -347,7 +383,84 @@
                             <span>Yesterday</span>
                         </div>
                     </div>
+                    <form action="">
+                        <input type="text" hidden>
+                        <button class="button_details" type="submit">see details</button>
+                    </form>
                 </div>
+            </article>
+                        <article class="post-card">
+                <div class="card-image-wrapper">
+                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
+                    <span class="status-badge found">Found</span>
+                    <span class="category-badge">phone</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Silver MacBook Pro (2021)</h3>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>Central Station</span>
+                        </div>
+                        <div class="meta-item">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span>Yesterday</span>
+                        </div>
+                    </div>
+                    <form action="">
+                        <input type="text" hidden>
+                        <button class="button_details" type="submit">see details</button>
+                    </form>
+                </div>
+            </article>
+                        <article class="post-card">
+                <div class="card-image-wrapper">
+                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
+                    <span class="status-badge found">Found</span>
+                    <span class="category-badge">phone</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Silver MacBook Pro (2021)</h3>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>Central Station</span>
+                        </div>
+                        <div class="meta-item">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span>Yesterday</span>
+                        </div>
+                    </div>
+                    <form action="">
+                        <input type="text" hidden>
+                        <button class="button_details" type="submit">see details</button>
+                    </form>
+                </div>
+            </article>
+                        <article class="post-card">
+                <div class="card-image-wrapper">
+                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
+                    <span class="status-badge found">Found</span>
+                    <span class="category-badge">phone</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Silver MacBook Pro (2021)</h3>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>Central Station</span>
+                        </div>
+                        <div class="meta-item">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span>Yesterday</span>
+                        </div>
+                    </div>
+                    <form action="">
+                        <input type="text" hidden>
+                        <button class="button_details" type="submit">see details</button>
+                    </form>
+                </div>
+            </article>
         </section>
     </div>
 </body>

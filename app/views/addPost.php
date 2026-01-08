@@ -43,6 +43,7 @@
 
         /* --- 2. Main Container --- */
         .form-container {
+            margin-top: 50px;
             background: var(--bg-card);
             width: 100%;
             max-width: 600px;
