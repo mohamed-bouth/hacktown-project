@@ -9,7 +9,7 @@
         <div class="nav-links">
             <a href="./dashboard.php" class="nav-link">Home</a>
             <a href="./postManagement.php" class="nav-link">Add Post</a>
-            <a href="./searchPost.php" class="nav-link">How it Works</a>
+            <a href="./searchPost.php" class="nav-link">Post searching</a>
         </div>
         <div>
             <a href="./addPost.php" class="nav-cta">Post an Item</a>
@@ -26,7 +26,7 @@
     <div class="mobile-menu" id="mobileMenu">
         <a href="./dashboard.php" class="nav-link">Home</a>
         <a href="./postManagement.php" class="nav-link">Add Post</a>
-        <a href="./searchPost.php" class="nav-link">How it Works</a>
+        <a href="./searchPost.php" class="nav-link">Post searching</a>
     </div>
 </nav>
 
