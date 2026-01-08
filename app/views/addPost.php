@@ -5,7 +5,6 @@ require_once __DIR__ . '/../Core/Database.php';
 
 use App\Core\Database;
 
-session_start();
 
 $errors = [];
 $success = isset($_GET['success']);

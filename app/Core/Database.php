@@ -11,7 +11,7 @@ class Database
     public static function getInstance(): PDO
     {
         if (self::$instance === null) {
-            $config = require __DIR__ . '/../../config/database.php';
+            $config = require __DIR__ . '/../../config/statistique.php';
 
             $dsn = sprintf(
                 'mysql:host=%s;dbname=%s;charset=utf8mb4',

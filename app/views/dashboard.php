@@ -7,14 +7,6 @@ require_once '../repositories/PostRepository.php';
 //     header("Location: ./auth/login.php");
 //     exit();
 // }
-
-// --- 2. FETCH DATA ---
-$database = new Database();
-$db = $database->getConnection();
-$postRepo = new PostRepository($db);
-
-// Get list of Post Objects
-$posts = $postRepo->getAllPosts();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -336,12 +328,12 @@ $posts = $postRepo->getAllPosts();
         <section class="section-of-card">
             <article class="post-card">
                 <div class="card-image-wrapper">
-                    <img src="https://picsum.photos\400\300" alt="Brown Leather Wallet" class="card-image">
+                    <img src="https://imgs.search.brave.com/qVXQkEpAKMNKCv_eCmNVq_1_Keb5-xJaU5pDjSxINis/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/bW9zLmNtcy5mdXR1/cmVjZG4ubmV0L1g0/dFpWeVRhOXJteXJW/d3Q3Z2lUd1UuanBn" alt="Brown Leather Wallet" class="card-image">
                     <span class="status-badge lost">Lost</span>
                     <span class="category-badge">phone</span>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">Vintage Brown Leather Wallet</h3>
+                    <h3 class="card-title">iphone 15 pro</h3>
                     <div class="card-meta">
                         <div class="meta-item">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -361,12 +353,12 @@ $posts = $postRepo->getAllPosts();
 
             <article class="post-card">
                 <div class="card-image-wrapper">
-                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
+                    <img src="https://imgs.search.brave.com/OLNuRjC8lxfTQnvBGQwMrhMYdKaTYwKPIRtjxpvml_g/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2JkLzAw/LzM4L2JkMDAzODdl/ZGQwYjU5YTA5MmVj/NTY2NGI2NWIwZDBk/LmpwZw" alt="Macbook Pro" class="card-image">
                     <span class="status-badge found">Found</span>
-                    <span class="category-badge">phone</span>
+                    <span class="category-badge">wallet</span>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">Silver MacBook Pro (2021)</h3>
+                    <h3 class="card-title">broun wallet</h3>
                     <div class="card-meta">
                         <div class="meta-item">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -385,9 +377,9 @@ $posts = $postRepo->getAllPosts();
             </article>
             <article class="post-card">
                 <div class="card-image-wrapper">
-                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
+                    <img src="https://imgs.search.brave.com/AUZqlDblyKnXNpJnHeFlCcZIUwba1sCafSCo2rK1oDw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvMTM2/OTA5NjA5MS9waG90/by9ibGFuay1zY3Jl/ZW4tbW9kZXJuLWxh/cHRvcC1vbi10YWJs/ZS5qcGc_cz02MTJ4/NjEyJnc9MCZrPTIw/JmM9bDdYTUk0QzE5/SHZ5R0ZqaEF3WDRl/cW1wcjV3dWh3b0FM/V1Z3eVVZNkhCUT0" alt="Macbook Pro" class="card-image">
                     <span class="status-badge found">Found</span>
-                    <span class="category-badge">phone</span>
+                    <span class="category-badge">pc</span>
                 </div>
                 <div class="card-content">
                     <h3 class="card-title">Silver MacBook Pro (2021)</h3>
@@ -409,12 +401,12 @@ $posts = $postRepo->getAllPosts();
             </article>
                         <article class="post-card">
                 <div class="card-image-wrapper">
-                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
-                    <span class="status-badge found">Found</span>
+                    <img src="https://imgs.search.brave.com/Vnl7KwO9usQbfFQtK6_q6ck0qexqMbAzwuKE7HfHegQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvODQ2/Njg4NzQ4L3Bob3Rv/L2JvbWJlci1qYWNr/ZXQuanBnP3M9NjEy/eDYxMiZ3PTAmaz0y/MCZjPXVtYV84V3ZM/M0E3cFJrQk13eEV0/clg4SlF3ZHNmY3Fp/aEhMQy0yX3NWdjA9" alt="Macbook Pro" class="card-image">
+                    <span class="status-badge lost">lost</span>
                     <span class="category-badge">phone</span>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">Silver MacBook Pro (2021)</h3>
+                    <h3 class="card-title">broun jacket</h3>
                     <div class="card-meta">
                         <div class="meta-item">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -433,12 +425,12 @@ $posts = $postRepo->getAllPosts();
             </article>
                         <article class="post-card">
                 <div class="card-image-wrapper">
-                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
-                    <span class="status-badge found">Found</span>
+                    <img src="https://imgs.search.brave.com/fX3JvXyEPnOZa-4l7NYIbNl3cglhf6Ru-H5fb59smhE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/ZHhvbWFyay5jb20v/d3AtY29udGVudC91/cGxvYWRzL21lZGlh/cy9wb3N0LTEwNjY4/OC9TYW1zdW5nLUdh/bGF4eS1TMjItVWx0/cmEtZmVhdHVyZWQt/aW1hZ2UtcGFja3No/b3QtcmV2aWV3LVJl/Y292ZXJlZC5qcGc" alt="Macbook Pro" class="card-image">
+                    <span class="status-badge lost">lost</span>
                     <span class="category-badge">phone</span>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">Silver MacBook Pro (2021)</h3>
+                    <h3 class="card-title">s 22 ultra</h3>
                     <div class="card-meta">
                         <div class="meta-item">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -457,12 +449,12 @@ $posts = $postRepo->getAllPosts();
             </article>
                         <article class="post-card">
                 <div class="card-image-wrapper">
-                    <img src="https://picsum.photos\400\300" alt="Macbook Pro" class="card-image">
+                    <img src="https://imgs.search.brave.com/IKnCpzta98IDd3bGG8PpqjpLBhbZwe708C7WnKgq-0M/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNzIv/NDQ4LzE3OC9zbWFs/bC9zbGVlay1ibGFj/ay1zbWFydHdhdGNo/LXdpdGgtdmlicmFu/dC1zY3JlZW4tZGlz/cGxheXMtbW9kZXJu/LXRlY2hub2xvZ3kt/YW5kLWNvbm5lY3Rp/dml0eS1pbi1zdHls/aXNoLWRlc2lnbi1l/bGVtZW50LXBob3Rv/LmpwZw" alt="Macbook Pro" class="card-image">
                     <span class="status-badge found">Found</span>
-                    <span class="category-badge">phone</span>
+                    <span class="category-badge">Smart watch</span>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">Silver MacBook Pro (2021)</h3>
+                    <h3 class="card-title">a smart watch</h3>
                     <div class="card-meta">
                         <div class="meta-item">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>

@@ -169,7 +169,7 @@ iframe {
 
     <!-- Example Post 1 -->
     <div class="post-card">
-        <img src="https://picsum.photos\400\300" class="post-image" alt="Item">
+        <img src="https://imgs.search.brave.com/OLNuRjC8lxfTQnvBGQwMrhMYdKaTYwKPIRtjxpvml_g/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2JkLzAw/LzM4L2JkMDAzODdl/ZGQwYjU5YTA5MmVj/NTY2NGI2NWIwZDBk/LmpwZw" class="post-image" alt="Item">
         <div class="post-body">
             <span class="badge lost">Lost</span>
             <h3>Black Leather Wallet</h3>
@@ -190,7 +190,7 @@ iframe {
 
     <!-- Example Post 2 -->
     <div class="post-card">
-        <img src="https://picsum.photos\400\300" class="post-image" alt="Item">
+        <img src="https://imgs.search.brave.com/2vsVxstmYOoIvSbdlwO9S0pG1TtPSnC9ZnlJVox0Z6g/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLWNk/bi5waG9uZWFyZW5h/LmNvbS9pbWFnZXMv/YXJ0aWNsZS8xNDk5/OTgtd2lkZS10d29f/MzUwL1N0b3Atc2F2/aW5nLXVwLWZvci0t/aVBob25lLTE1LVBy/by1hbmQtZ2V0LWFm/Zm9yZGFibGUtbGlr/ZS1uZXctaVBob25l/LTEzLVByby1pbnN0/ZWFkLndlYnA" class="post-image" alt="Item">
         <div class="post-body">
             <span class="badge found">Found</span>
             <h3>iPhone 13 Pro</h3>

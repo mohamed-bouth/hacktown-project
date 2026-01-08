@@ -1,6 +1,8 @@
 <?php
 // models/Post.php
 
+namespace App\Models;
+
 class Post
 {
     public int $id;

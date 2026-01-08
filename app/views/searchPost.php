@@ -1,3 +1,107 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../Core/Database.php';
+
+use App\Core\Database;
+
+function e(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}
+
+function timeAgo(string $timestamp): string
+{
+    $created = new DateTime($timestamp);
+    $now = new DateTime();
+    $diff = $now->getTimestamp() - $created->getTimestamp();
+
+    if ($diff < 3600) {
+        $minutes = max(1, (int) floor($diff / 60));
+        return $minutes . 'm ago';
+    }
+
+    if ($diff < 86400) {
+        $hours = (int) floor($diff / 3600);
+        return $hours . 'h ago';
+    }
+
+    if ($diff < 604800) {
+        $days = (int) floor($diff / 86400);
+        return $days . 'd ago';
+    }
+
+    return $created->format('M j, Y');
+}
+
+$filters = [
+    'keyword' => trim($_GET['keyword'] ?? ''),
+    'type' => $_GET['type'] ?? '',
+    'city' => trim($_GET['city'] ?? ''),
+    'date' => $_GET['date'] ?? '',
+    'sort' => $_GET['sort'] ?? 'newest',
+    'categories' => $_GET['category'] ?? [],
+];
+
+$allowedTypes = ['lost', 'found'];
+$allowedCategories = ['CIN', 'Phone', 'Document', 'Wallet', 'Other'];
+$allowedDate = ['24h', '7d', '30d'];
+$allowedSort = ['newest', 'oldest'];
+
+$db = Database::getInstance();
+$sql = 'SELECT * FROM posts WHERE status = :status';
+$params = ['status' => 'active'];
+
+if (in_array($filters['type'], $allowedTypes, true)) {
+    $sql .= ' AND type = :type';
+    $params['type'] = $filters['type'];
+}
+
+if ($filters['city'] !== '') {
+    $sql .= ' AND city LIKE :city';
+    $params['city'] = '%' . $filters['city'] . '%';
+}
+
+if ($filters['keyword'] !== '') {
+    $sql .= ' AND (description LIKE :kw OR location_text LIKE :kw OR city LIKE :kw OR category LIKE :kw)';
+    $params['kw'] = '%' . $filters['keyword'] . '%';
+}
+
+$selectedCategories = array_values(array_intersect($allowedCategories, (array) $filters['categories']));
+if (!empty($selectedCategories)) {
+    $placeholders = [];
+    foreach ($selectedCategories as $index => $category) {
+        $key = 'cat' . $index;
+        $placeholders[] = ':' . $key;
+        $params[$key] = $category;
+    }
+    $sql .= ' AND category IN (' . implode(', ', $placeholders) . ')';
+}
+
+if (in_array($filters['date'], $allowedDate, true)) {
+    if ($filters['date'] === '24h') {
+        $sql .= ' AND created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+    } elseif ($filters['date'] === '7d') {
+        $sql .= ' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+    } else {
+        $sql .= ' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)';
+    }
+}
+
+$sql .= $filters['sort'] === 'oldest' ? ' ORDER BY created_at ASC' : ' ORDER BY created_at DESC';
+
+$stmt = $db->prepare($sql);
+$stmt->execute($params);
+$posts = $stmt->fetchAll();
+
+$categoryImages = [
+    'CIN' => 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+    'Phone' => 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80',
+    'Document' => 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=800&q=80',
+    'Wallet' => 'https://images.unsplash.com/photo-1512412046876-f386342eddb3?auto=format&fit=crop&w=800&q=80',
+    'Other' => 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80',
+];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -248,6 +352,28 @@
 
         .card-content { padding: 16px; }
 
+        .category-pill {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-radius: 999px;
+            background: #F3F4F6;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .card-desc {
+            margin: 8px 0 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
         .card-title {
             font-size: 1rem;
             font-weight: 600;
@@ -279,13 +405,14 @@
 </head>
 <body>
 
+    <form method="GET" action="">
     <header class="site-header">
         <a href="#" class="logo">FoundAndLost</a>
         <div class="header-search">
             <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input type="text" placeholder="Search by item name, location, or keyword...">
+            <input type="text" name="keyword" value="<?= e($filters['keyword']) ?>" placeholder="Search by item name, location, or keyword...">
         </div>
     </header>
 
@@ -296,11 +423,11 @@
                 <div class="filter-title">Status</div>
                 <div class="status-toggle">
                     <div class="status-option">
-                        <input type="radio" name="status" id="s-lost" value="lost" checked>
+                        <input type="radio" name="type" id="s-lost" value="lost" <?= $filters['type'] === 'lost' ? 'checked' : '' ?>>
                         <label for="s-lost">Lost</label>
                     </div>
                     <div class="status-option">
-                        <input type="radio" name="status" id="s-found" value="found">
+                        <input type="radio" name="type" id="s-found" value="found" <?= $filters['type'] === 'found' ? 'checked' : '' ?>>
                         <label for="s-found">Found</label>
                     </div>
                 </div>
@@ -308,123 +435,69 @@
 
             <div class="filter-group">
                 <div class="filter-title">City</div>
-                <input type="text" placeholder="e.g. Chicago" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
+                <input type="text" name="city" value="<?= e($filters['city']) ?>" placeholder="e.g. Casablanca" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
             </div>
 
             <div class="filter-group">
                 <div class="filter-title">Category</div>
-                <label class="checkbox-label"><input type="checkbox" checked> Electronics</label>
-                <label class="checkbox-label"><input type="checkbox"> Wallets / ID</label>
-                <label class="checkbox-label"><input type="checkbox"> Keys</label>
-                <label class="checkbox-label"><input type="checkbox"> Pets</label>
-                <label class="checkbox-label"><input type="checkbox"> Clothing</label>
+                <label class="checkbox-label"><input type="checkbox" name="category[]" value="CIN" <?= in_array('CIN', $selectedCategories, true) ? 'checked' : '' ?>> CIN</label>
+                <label class="checkbox-label"><input type="checkbox" name="category[]" value="Phone" <?= in_array('Phone', $selectedCategories, true) ? 'checked' : '' ?>> Phone</label>
+                <label class="checkbox-label"><input type="checkbox" name="category[]" value="Document" <?= in_array('Document', $selectedCategories, true) ? 'checked' : '' ?>> Document</label>
+                <label class="checkbox-label"><input type="checkbox" name="category[]" value="Wallet" <?= in_array('Wallet', $selectedCategories, true) ? 'checked' : '' ?>> Wallet</label>
+                <label class="checkbox-label"><input type="checkbox" name="category[]" value="Other" <?= in_array('Other', $selectedCategories, true) ? 'checked' : '' ?>> Other</label>
             </div>
 
             <div class="filter-group">
                 <div class="filter-title">Date Posted</div>
-                <label class="checkbox-label"><input type="radio" name="date"> Last 24 Hours</label>
-                <label class="checkbox-label"><input type="radio" name="date" checked> Last Week</label>
-                <label class="checkbox-label"><input type="radio" name="date"> Last Month</label>
+                <label class="checkbox-label"><input type="radio" name="date" value="" <?= $filters['date'] === '' ? 'checked' : '' ?>> Any time</label>
+                <label class="checkbox-label"><input type="radio" name="date" value="24h" <?= $filters['date'] === '24h' ? 'checked' : '' ?>> Last 24 Hours</label>
+                <label class="checkbox-label"><input type="radio" name="date" value="7d" <?= $filters['date'] === '7d' ? 'checked' : '' ?>> Last Week</label>
+                <label class="checkbox-label"><input type="radio" name="date" value="30d" <?= $filters['date'] === '30d' ? 'checked' : '' ?>> Last Month</label>
             </div>
             
-            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--border-color); cursor: pointer; border-radius: 6px; color: var(--text-secondary);">Reset Filters</button>
+            <button type="submit" style="width: 100%; padding: 10px; background: #111827; border: 1px solid #111827; cursor: pointer; border-radius: 6px; color: #FFFFFF; margin-bottom: 8px;">Apply Filters</button>
+            <a href="searchPost.php" style="display:block; text-align:center; width: 100%; padding: 10px; background: transparent; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-secondary); text-decoration:none;">Reset Filters</a>
         </aside>
 
         <section class="results-area">
             <div class="results-header">
-                <div class="results-count">Showing 14 Results</div>
-                <select class="sort-select">
-                    <option>Newest First</option>
-                    <option>Oldest First</option>
+                <div class="results-count">Showing <?= count($posts) ?> Results</div>
+                <select class="sort-select" name="sort" onchange="this.form.submit()">
+                    <option value="newest" <?= $filters['sort'] === 'newest' ? 'selected' : '' ?>>Newest First</option>
+                    <option value="oldest" <?= $filters['sort'] === 'oldest' ? 'selected' : '' ?>>Oldest First</option>
                 </select>
             </div>
 
             <div class="cards-grid">
-                <article class="post-card">
-                    <div class="card-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1547496502-ffa22ed47b72?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Item" class="card-image">
-                        <span class="status-pill lost">Lost</span>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Brown Leather Wallet</h3>
-                        <div class="card-meta">
-                            <span>Brooklyn, NY</span>
-                            <span>2h ago</span>
-                        </div>
-                    </div>
-                </article>
+                <?php if (empty($posts)): ?>
+                    <div style="color: var(--text-secondary); font-weight: 600;">No results found. Try adjusting filters.</div>
+                <?php endif; ?>
 
-                <article class="post-card">
-                    <div class="card-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Item" class="card-image">
-                        <span class="status-pill found">Found</span>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">MacBook Pro 13"</h3>
-                        <div class="card-meta">
-                            <span>Central Station</span>
-                            <span>5h ago</span>
+                <?php foreach ($posts as $post): ?>
+                    <?php
+                        $category = $post['category'] ?? 'Other';
+                        $image = $categoryImages[$category] ?? $categoryImages['Other'];
+                        $description = trim((string) ($post['description'] ?? ''));
+                        $location = trim((string) ($post['location_text'] ?? $post['city'] ?? ''));
+                    ?>
+                    <article class="post-card">
+                        <div class="card-image-wrapper">
+                            <img src="<?= e($image) ?>" alt="<?= e($category) ?>" class="card-image">
+                            <span class="status-pill <?= e($post['type']) ?>"><?= e($post['type']) ?></span>
                         </div>
-                    </div>
-                </article>
-
-                <article class="post-card">
-                    <div class="card-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1582233479366-6d38bc390a08?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Item" class="card-image">
-                        <span class="status-pill lost">Lost</span>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Golden Retriever (Rex)</h3>
-                        <div class="card-meta">
-                            <span>Austin, TX</span>
-                            <span>1d ago</span>
+                        <div class="card-content">
+                            <h3 class="card-title"><?= e($category) ?><span class="category-pill"><?= e($post['city']) ?></span></h3>
+                            <p class="card-desc"><?= e($description !== '' ? $description : 'No description provided.') ?></p>
+                            <div class="card-meta">
+                                <span><?= e($location) ?></span>
+                                <span><?= e(timeAgo($post['created_at'])) ?></span>
+                            </div>
                         </div>
-                    </div>
-                </article>
-
-                <article class="post-card">
-                    <div class="card-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1589578228447-e1a4e481c6c8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Item" class="card-image">
-                        <span class="status-pill found">Found</span>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Set of House Keys</h3>
-                        <div class="card-meta">
-                            <span>Main St. Park</span>
-                            <span>1d ago</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="post-card">
-                    <div class="card-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1621600411688-4be93cd68504?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Item" class="card-image">
-                        <span class="status-pill lost">Lost</span>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">iPhone 13 - Blue Case</h3>
-                        <div class="card-meta">
-                            <span>Chicago, IL</span>
-                            <span>2d ago</span>
-                        </div>
-                    </div>
-                </article>
-
-                 <article class="post-card">
-                    <div class="card-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1559563458-527698bf5295?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Item" class="card-image">
-                        <span class="status-pill found">Found</span>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Black Tote Bag</h3>
-                        <div class="card-meta">
-                            <span>Metro Line 4</span>
-                            <span>3d ago</span>
-                        </div>
-                    </div>
-                </article>
+                    </article>
+                <?php endforeach; ?>
             </div>
         </section>
     </main>
+    </form>
 </body>
 </html>
