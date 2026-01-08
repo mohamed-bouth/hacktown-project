@@ -1,12 +1,112 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../Core/Database.php';
+
+use App\Core\Database;
+
+session_start();
+
+$errors = [];
+$success = isset($_GET['success']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userId = $_SESSION['user_id'] ?? null;
+    $type = $_POST['type'] ?? '';
+    $category = $_POST['category'] ?? '';
+    $city = trim($_POST['city'] ?? '');
+    $locationText = trim($_POST['location_text'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $whatsapp = trim($_POST['whatsapp'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+
+    $allowedTypes = ['lost', 'found'];
+    $allowedCategories = ['CIN', 'Phone', 'Document', 'Wallet', 'Other'];
+
+    if (!in_array($type, $allowedTypes, true)) {
+        $errors[] = 'Please select a valid type.';
+    }
+
+    if (!in_array($category, $allowedCategories, true)) {
+        $errors[] = 'Please select a valid category.';
+    }
+
+    if ($city === '') {
+        $errors[] = 'City is required.';
+    }
+
+    if ($locationText === '') {
+        $errors[] = 'Location is required.';
+    }
+
+    if ($description === '') {
+        $errors[] = 'Description is required.';
+    }
+
+    if (strlen($description) > 500) {
+        $errors[] = 'Description must be 500 characters or less.';
+    }
+
+    if ($whatsapp === '') {
+        $errors[] = 'WhatsApp number is required.';
+    }
+
+    if (empty($errors)) {
+        $db = Database::getInstance();
+
+        if ($userId === null) {
+            $guestEmail = 'guest@local.test';
+            $stmt = $db->prepare('SELECT id FROM users WHERE email = :email');
+            $stmt->execute(['email' => $guestEmail]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $userId = (int) $row['id'];
+            } else {
+                $stmt = $db->prepare(
+                    'INSERT INTO users (name, email, password, phone, created_at)
+                     VALUES (:name, :email, :password, :phone, NOW())'
+                );
+                $stmt->execute([
+                    'name' => 'Guest',
+                    'email' => $guestEmail,
+                    'password' => password_hash('guest', PASSWORD_DEFAULT),
+                    'phone' => null,
+                ]);
+                $userId = (int) $db->lastInsertId();
+            }
+        }
+
+        $stmt = $db->prepare(
+            'INSERT INTO posts (user_id, type, category, city, location_text, description, whatsapp, phone, status, created_at)
+             VALUES (:user_id, :type, :category, :city, :location_text, :description, :whatsapp, :phone, :status, NOW())'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'type' => $type,
+            'category' => $category,
+            'city' => $city,
+            'location_text' => $locationText,
+            'description' => $description,
+            'whatsapp' => preg_replace('/\D+/', '', $whatsapp),
+            'phone' => $phone !== '' ? preg_replace('/\D+/', '', $phone) : null,
+            'status' => 'active',
+        ]);
+
+        header('Location: addPost.php?success=1');
+        exit;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FoundAndLost - Add Post</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/navbar.css">
-<?php require_once "./partials/navbar.php" ?>
+    <?php require_once "./partials/navbar.php" ?>
     <style>
         /* --- 1. Design Variables --- */
         :root {
@@ -15,7 +115,7 @@
             --text-primary: #111827;
             --text-secondary: #6B7280;
             --border-color: #E5E7EB;
-            
+
             /* Status Colors */
             --color-lost: #EF4444;
             --color-lost-hover: #DC2626;
@@ -51,7 +151,8 @@
             box-shadow: var(--shadow-card);
             overflow: hidden;
             transition: border-color 0.3s ease;
-            border-top: 6px solid var(--theme-color); /* Visual indicator of current mode */
+            border-top: 6px solid var(--theme-color);
+            /* Visual indicator of current mode */
         }
 
         /* --- 3. The Toggle Section --- */
@@ -77,16 +178,18 @@
 
         /* State: Active Lost (Red) */
         .form-container[data-theme="lost"] .toggle-btn[data-type="lost"] {
-            background-color: #FEF2F2; /* Very light red */
+            background-color: #FEF2F2;
+            /* Very light red */
             color: var(--color-lost);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         /* State: Active Found (Green) */
         .form-container[data-theme="found"] .toggle-btn[data-type="found"] {
-            background-color: #ECFDF5; /* Very light green */
+            background-color: #ECFDF5;
+            /* Very light green */
             color: var(--color-found);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         /* --- 4. Form Content --- */
@@ -109,7 +212,7 @@
             color: var(--text-primary);
         }
 
-        input[type="text"], 
+        input[type="text"],
         input[type="date"],
         select,
         textarea {
@@ -121,14 +224,18 @@
             color: var(--text-primary);
             transition: border-color 0.2s, box-shadow 0.2s;
             width: 100%;
-            box-sizing: border-box; /* Ensures padding doesn't break width */
+            box-sizing: border-box;
+            /* Ensures padding doesn't break width */
         }
 
         /* Focus State uses the Theme Color */
-        input:focus, select:focus, textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--theme-color);
-            box-shadow: 0 0 0 3px rgba(0,0,0,0.05); /* Subtle ring */
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+            /* Subtle ring */
         }
 
         /* --- 5. File Upload --- */
@@ -196,13 +303,13 @@
         .submit-btn:hover {
             background-color: var(--theme-color-hover);
         }
-
     </style>
 </head>
+
 <body>
 
     <div class="form-container" id="postForm" data-theme="lost">
-        
+
         <div class="toggle-header">
             <button class="toggle-btn" data-type="lost" onclick="setTheme('lost')">
                 I Lost Something
@@ -212,86 +319,89 @@
             </button>
         </div>
 
-        <form class="form-body" onsubmit="event.preventDefault(); alert('Post Published!');">
-            
+        <form class="form-body" method="POST" action="">
+            <?php if ($success): ?>
+                <p style="color:#059669; font-weight:600;">Your listing has been published.</p>
+            <?php endif; ?>
+            <?php if (!empty($errors)): ?>
+                <div style="color:#B91C1C; font-weight:600;">
+                    <?php foreach ($errors as $error): ?>
+                        <div><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
             <div class="form-group">
                 <label for="title">What is the item?</label>
-                <input type="text" id="title" placeholder="e.g. Black Leather Wallet" required>
+                <input type="text" name="title" id="title"
+                    placeholder="e.g. Black Leather Wallet" required>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
                 <div class="form-group">
-                    <label for="category">Category</label>
-                    <select id="category">
-                        <option>Electronics</option>
-                        <option>Wallet / Money</option>
-                        <option>Keys</option>
-                        <option>Pets</option>
-                        <option>Documents</option>
-                        <option>Clothing</option>
+                    <label>Category</label>
+                    <select name="category">
+                        <option>CIN</option>
+                        <option>Phone</option>
+                        <option>Document</option>
+                        <option>Wallet</option>
                         <option>Other</option>
                     </select>
                 </div>
+
                 <div class="form-group">
-                    <label for="city">City</label>
-                    <input type="text" id="city" placeholder="e.g. New York">
+                    <label>City</label>
+                    <input type="text" name="city" placeholder="Casablanca" required>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+            <div style="display:grid; grid-template-columns:2fr 1fr; gap:20px;">
                 <div class="form-group">
-                    <label for="location">Specific Location (Optional)</label>
-                    <input type="text" id="location" placeholder="e.g. Near the Central Fountain">
+                    <label>Location</label>
+                    <input type="text" name="location_text"
+                        placeholder="Near central market" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="date">Date</label>
-                    <input type="date" id="date" required>
+                    <label>Date</label>
+                    <input type="date" name="lost_date" required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" rows="4" placeholder="Describe distinct features, scratches, contents, etc."></textarea>
+                <label>Description</label>
+                <textarea name="description" rows="4" required></textarea>
             </div>
 
             <div class="form-group">
-                <label>Photos</label>
-                <div class="upload-area">
-                    <svg class="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <div class="upload-text">Click to upload or drag and drop</div>
-                </div>
+                <label>WhatsApp</label>
+                <input type="text" name="whatsapp" required>
             </div>
 
             <div class="form-group">
-                <label>Contact Method</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" checked> In-app Chat
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox"> Phone
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox"> Email
-                    </label>
-                </div>
+                <label>Phone (optional)</label>
+                <input type="text" name="phone">
             </div>
 
-            <button type="submit" class="submit-btn" id="submitBtn">Publish Lost Listing</button>
+            <input type="hidden" name="type" value="lost" id="postType">
 
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Publish Lost Listing
+            </button>
         </form>
+
     </div>
 
     <script>
         function setTheme(type) {
             const formContainer = document.getElementById('postForm');
             const submitBtn = document.getElementById('submitBtn');
+            const postType = document.getElementById('postType');
             const root = document.documentElement;
 
             // 1. Update the data attribute on the container
             formContainer.setAttribute('data-theme', type);
+            postType.value = type;
 
             // 2. Update CSS Variables dynamically for the theme colors
             if (type === 'lost') {
@@ -306,4 +416,5 @@
         }
     </script>
 </body>
+
 </html>
