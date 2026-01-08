@@ -1,3 +1,102 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../Core/Database.php';
+
+use App\Core\Database;
+
+session_start();
+
+$errors = [];
+$success = isset($_GET['success']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userId = $_SESSION['user_id'] ?? null;
+    $type = $_POST['type'] ?? '';
+    $category = $_POST['category'] ?? '';
+    $city = trim($_POST['city'] ?? '');
+    $locationText = trim($_POST['location_text'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $whatsapp = trim($_POST['whatsapp'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+
+    $allowedTypes = ['lost', 'found'];
+    $allowedCategories = ['CIN', 'Phone', 'Document', 'Wallet', 'Other'];
+
+    if (!in_array($type, $allowedTypes, true)) {
+        $errors[] = 'Please select a valid type.';
+    }
+
+    if (!in_array($category, $allowedCategories, true)) {
+        $errors[] = 'Please select a valid category.';
+    }
+
+    if ($city === '') {
+        $errors[] = 'City is required.';
+    }
+
+    if ($locationText === '') {
+        $errors[] = 'Location is required.';
+    }
+
+    if ($description === '') {
+        $errors[] = 'Description is required.';
+    }
+
+    if (strlen($description) > 500) {
+        $errors[] = 'Description must be 500 characters or less.';
+    }
+
+    if ($whatsapp === '') {
+        $errors[] = 'WhatsApp number is required.';
+    }
+
+    if (empty($errors)) {
+        $db = Database::getInstance();
+
+        if ($userId === null) {
+            $guestEmail = 'guest@local.test';
+            $stmt = $db->prepare('SELECT id FROM users WHERE email = :email');
+            $stmt->execute(['email' => $guestEmail]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $userId = (int) $row['id'];
+            } else {
+                $stmt = $db->prepare(
+                    'INSERT INTO users (name, email, password, phone, created_at)
+                     VALUES (:name, :email, :password, :phone, NOW())'
+                );
+                $stmt->execute([
+                    'name' => 'Guest',
+                    'email' => $guestEmail,
+                    'password' => password_hash('guest', PASSWORD_DEFAULT),
+                    'phone' => null,
+                ]);
+                $userId = (int) $db->lastInsertId();
+            }
+        }
+
+        $stmt = $db->prepare(
+            'INSERT INTO posts (user_id, type, category, city, location_text, description, whatsapp, phone, status, created_at)
+             VALUES (:user_id, :type, :category, :city, :location_text, :description, :whatsapp, :phone, :status, NOW())'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'type' => $type,
+            'category' => $category,
+            'city' => $city,
+            'location_text' => $locationText,
+            'description' => $description,
+            'whatsapp' => preg_replace('/\D+/', '', $whatsapp),
+            'phone' => $phone !== '' ? preg_replace('/\D+/', '', $phone) : null,
+            'status' => 'active',
+        ]);
+
+        header('Location: addPost.php?success=1');
+        exit;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -220,7 +319,17 @@
             </button>
         </div>
 
-        <form class="form-body" method="POST" action="/posts">
+        <form class="form-body" method="POST" action="">
+            <?php if ($success): ?>
+                <p style="color:#059669; font-weight:600;">Your listing has been published.</p>
+            <?php endif; ?>
+            <?php if (!empty($errors)): ?>
+                <div style="color:#B91C1C; font-weight:600;">
+                    <?php foreach ($errors as $error): ?>
+                        <div><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
 
             <div class="form-group">
                 <label for="title">What is the item?</label>
@@ -232,12 +341,10 @@
                 <div class="form-group">
                     <label>Category</label>
                     <select name="category">
-                        <option>Electronics</option>
+                        <option>CIN</option>
+                        <option>Phone</option>
+                        <option>Document</option>
                         <option>Wallet</option>
-                        <option>Keys</option>
-                        <option>Pets</option>
-                        <option>Documents</option>
-                        <option>Clothing</option>
                         <option>Other</option>
                     </select>
                 </div>
@@ -252,7 +359,7 @@
                 <div class="form-group">
                     <label>Location</label>
                     <input type="text" name="location_text"
-                        placeholder="Near central market">
+                        placeholder="Near central market" required>
                 </div>
 
                 <div class="form-group">
@@ -263,7 +370,7 @@
 
             <div class="form-group">
                 <label>Description</label>
-                <textarea name="description" rows="4"></textarea>
+                <textarea name="description" rows="4" required></textarea>
             </div>
 
             <div class="form-group">
@@ -271,9 +378,14 @@
                 <input type="text" name="whatsapp" required>
             </div>
 
-            <input type="hidden" name="type" value="lost">
+            <div class="form-group">
+                <label>Phone (optional)</label>
+                <input type="text" name="phone">
+            </div>
 
-            <button type="submit" class="submit-btn">
+            <input type="hidden" name="type" value="lost" id="postType">
+
+            <button type="submit" class="submit-btn" id="submitBtn">
                 Publish Lost Listing
             </button>
         </form>
@@ -284,10 +396,12 @@
         function setTheme(type) {
             const formContainer = document.getElementById('postForm');
             const submitBtn = document.getElementById('submitBtn');
+            const postType = document.getElementById('postType');
             const root = document.documentElement;
 
             // 1. Update the data attribute on the container
             formContainer.setAttribute('data-theme', type);
+            postType.value = type;
 
             // 2. Update CSS Variables dynamically for the theme colors
             if (type === 'lost') {
