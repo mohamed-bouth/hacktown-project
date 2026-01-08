@@ -1,5 +1,5 @@
 <?php
-namespace App\Models;
+// models/Post.php
 
 class Post
 {
@@ -51,3 +51,4 @@ class Post
         return ucfirst($this->type) . " " . ucfirst($this->category);
     }
 }
+?>
