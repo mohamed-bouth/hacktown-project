@@ -1,3 +1,5 @@
+<?php session_start(); ?>
+
 <nav class="main-navbar">
     <div class="nav-container">
         <a href="index.html" class="nav-logo">
@@ -9,8 +11,10 @@
             <a href="./postManagement.php" class="nav-link">Add Post</a>
             <a href="./searchPost.php" class="nav-link">How it Works</a>
         </div>
-
-        <a href="./addPost.php" class="nav-cta">Post an Item</a>
+        <div>
+            <a href="./addPost.php" class="nav-cta">Post an Item</a>
+            <a href="./auth/logout.php" class="nav-cta2">logout</a>
+        </div>
 
         <button class="mobile-toggle" onclick="toggleMenu()">
             <span class="bar"></span>

@@ -290,7 +290,7 @@
         <section class="dashboard-hero">
             <div class="hero-content">
                 <h1 class="hero-title">
-                    Hello, Alex! <span class="wave">👋</span>
+                    Hello, <?=  $_SESSION['user_name'] ?>! <span class="wave">👋</span>
                 </h1>
                 <p class="hero-subtitle">
                     Welcome back to FoundAndLost. Let's get things back to where they belong.
